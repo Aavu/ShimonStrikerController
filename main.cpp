@@ -8,7 +8,8 @@ int main(int argc, char * argv[]) {
         auto controller = StrikerController(1);
         controller.startOSC(30309);
     } catch (std::exception &e) {
-        std::cout << "error " << e.what() << endl;
+        std::cout << e.what() << endl;
+        return 1;
     }
     return 0;
 }

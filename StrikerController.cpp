@@ -20,12 +20,13 @@ StrikerController::StrikerController(int numberOfStrikers) {
 
 int StrikerController::prepareStrikers() {
     lResult = MMC_SUCCESS;
+    unsigned int errorCode = 0;
     for (auto &s : strikers) {
         if ((lResult = s.lResult) != MMC_SUCCESS) {
             return lResult;
         } else {
             if ((lResult = s.Prepare()) != MMC_SUCCESS) {
-                s.LogError("Prepare", lResult, *s.p_pErrorCode);
+                s.LogError("Prepare", lResult, errorCode);
                 return lResult;
             }
         }

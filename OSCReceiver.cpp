@@ -29,6 +29,7 @@ int OSCReceiver::start(int port) {
                       OSCReceiver::handleQuit(argv);
                   });
     quit = false;
+    std::cout << "Starting server" << std::endl;
     st.start();
     listen(st);
     return 0;
@@ -41,12 +42,12 @@ int OSCReceiver::listen(lo::ServerThread &st) {
         usleep(10*1000);
     }
     st.stop();
-    std::cout << "Success!" << std::endl;
     return 0;
 }
 
 void OSCReceiver::handleQuit(lo_arg **argv) {
     string command = &argv[0] -> s;
+    transform(command.begin(), command.end(), command.begin(), ::tolower);
     if (command == "quit") quit = true;
 }
 

@@ -41,7 +41,7 @@ void Striker::SetDefaultParameters() {
 
 int Striker::OpenDevice() {
     lResult = MMC_FAILED;
-
+    unsigned int errorCode = 0;
     char *pDeviceName = new char[255];
     char *pProtocolStackName = new char[255];
     char *pInterfaceName = new char[255];
@@ -51,17 +51,17 @@ int Striker::OpenDevice() {
     strcpy(pProtocolStackName, g_protocolStackName.c_str());
     strcpy(pInterfaceName, g_interfaceName.c_str());
     strcpy(pPortName, g_portName.c_str());
+    LogInfo("Open device...");
+    g_pKeyHandle = VCS_OpenDevice(pDeviceName, pProtocolStackName, pInterfaceName, pPortName, &errorCode);
 
-    g_pKeyHandle = VCS_OpenDevice(pDeviceName, pProtocolStackName, pInterfaceName, pPortName, p_pErrorCode);
-
-    if (g_pKeyHandle != nullptr && *p_pErrorCode == 0) {
+    if (g_pKeyHandle != 0 && errorCode == 0) {
         cout << "Successfully Opened Striker-" << getID() << endl;
         unsigned int lBaudrate = 0;
         unsigned int lTimeout = 0;
 
-        if (VCS_GetProtocolStackSettings(g_pKeyHandle, &lBaudrate, &lTimeout, p_pErrorCode) != 0) {
-            if (VCS_SetProtocolStackSettings(g_pKeyHandle, g_baudrate, lTimeout, p_pErrorCode) != 0) {
-                if (VCS_GetProtocolStackSettings(g_pKeyHandle, &lBaudrate, &lTimeout, p_pErrorCode) != 0) {
+        if (VCS_GetProtocolStackSettings(g_pKeyHandle, &lBaudrate, &lTimeout, &errorCode) != 0) {
+            if (VCS_SetProtocolStackSettings(g_pKeyHandle, g_baudrate, lTimeout, &errorCode) != 0) {
+                if (VCS_GetProtocolStackSettings(g_pKeyHandle, &lBaudrate, &lTimeout, &errorCode) != 0) {
                     if (g_baudrate == lBaudrate) {
                         lResult = MMC_SUCCESS;
                     }
@@ -69,7 +69,7 @@ int Striker::OpenDevice() {
             }
         }
     } else {
-        g_pKeyHandle = nullptr;
+        g_pKeyHandle = 0;
     }
 
     delete[]pDeviceName;
@@ -82,15 +82,15 @@ int Striker::OpenDevice() {
 
 int Striker::CloseDevice() {
     lResult = MMC_FAILED;
-
+    unsigned int errorCode = 0;
     LogInfo("Close device");
 
-    if (VCS_SetDisableState(g_pKeyHandle, g_usNodeId, p_pErrorCode) == 0) {
-        LogError("VCS_SetDisableState", lResult, *p_pErrorCode);
+    if (VCS_SetDisableState(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
+        LogError("VCS_SetDisableState", lResult, errorCode);
         lResult = MMC_FAILED;
     }
 
-    if (VCS_CloseDevice(g_pKeyHandle, p_pErrorCode) != 0 && *p_pErrorCode == 0) {
+    if (VCS_CloseDevice(g_pKeyHandle, &errorCode) != 0 && errorCode == 0) {
         lResult = MMC_SUCCESS;
     }
 
@@ -100,8 +100,9 @@ int Striker::CloseDevice() {
 int Striker::Prepare() {
     BOOL oIsFault = 0;
     lResult = MMC_SUCCESS;
-    if (VCS_GetFaultState(g_pKeyHandle, g_usNodeId, &oIsFault, p_pErrorCode) == 0) {
-        LogError("VCS_GetFaultState", lResult, *p_pErrorCode);
+    unsigned int errorCode = 0;
+    if (VCS_GetFaultState(g_pKeyHandle, g_usNodeId, &oIsFault, &errorCode) == 0) {
+        LogError("VCS_GetFaultState", lResult, errorCode);
         lResult = MMC_FAILED;
     }
 
@@ -110,8 +111,8 @@ int Striker::Prepare() {
             stringstream msg;
             msg << "clear fault, node = '" << g_usNodeId << "'";
             LogInfo(msg.str());
-            if (VCS_ClearFault(g_pKeyHandle, g_usNodeId, p_pErrorCode) == 0) {
-                LogError("VCS_ClearFault", lResult, *p_pErrorCode);
+            if (VCS_ClearFault(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
+                LogError("VCS_ClearFault", lResult, errorCode);
                 lResult = MMC_FAILED;
             }
         }
@@ -119,18 +120,18 @@ int Striker::Prepare() {
         if (lResult == MMC_SUCCESS) {
             BOOL oIsEnabled = 0;
 
-            if (VCS_GetEnableState(g_pKeyHandle, g_usNodeId, &oIsEnabled, p_pErrorCode) == 0) {
-                LogError("VCS_GetEnableState", lResult, *p_pErrorCode);
+            if (VCS_GetEnableState(g_pKeyHandle, g_usNodeId, &oIsEnabled, &errorCode) == 0) {
+                LogError("VCS_GetEnableState", lResult, errorCode);
                 lResult = MMC_FAILED;
             }
 
             if (lResult == MMC_SUCCESS) {
                 if (!oIsEnabled) {
-                    if (VCS_SetEnableState(g_pKeyHandle, g_usNodeId, p_pErrorCode) == 0) {
-                        LogError("VCS_SetEnableState", lResult, *p_pErrorCode);
+                    if (VCS_SetEnableState(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
+                        LogError("VCS_SetEnableState", lResult, errorCode);
                         lResult = MMC_FAILED;
                     } else if (setHome() != MMC_SUCCESS) {
-                        LogError("setHome", lResult, *p_pErrorCode);
+                        LogError("setHome", lResult, errorCode);
                         lResult = MMC_FAILED;
                     }
                 }
@@ -138,7 +139,7 @@ int Striker::Prepare() {
 
             if (lResult == MMC_SUCCESS) {
                 if (moveToPosition(-150, 5000) != MMC_SUCCESS) {
-                    LogError("moveToPosition", lResult, *p_pErrorCode);
+                    LogError("moveToPosition", lResult, errorCode);
                     lResult = MMC_FAILED;
                 }
             }
@@ -151,8 +152,9 @@ Striker::Striker(int armID, int motorID) {
     this->armID = armID;
     this->motorID = motorID;
     SetDefaultParameters();
+    unsigned int errorCode = 0;
     if ((lResult = OpenDevice()) != MMC_SUCCESS) {
-        LogError("OpenDevice", lResult, *p_pErrorCode);
+        LogError("OpenDevice", lResult, errorCode);
     }
 }
 
@@ -161,14 +163,15 @@ int Striker::setHome() {
     lResult = MMC_SUCCESS;
     int lastPosition = 10000;
     int currentPosition = -10000;
+    unsigned int errorCode = 0;
     while (true) {
         if (moveToPosition(25, 1000, 0) != MMC_SUCCESS) {
-            LogError("moveToPosition", lResult, *p_pErrorCode);
+            LogError("moveToPosition", lResult, errorCode);
             lResult = MMC_FAILED;
             return lResult;
         }
-        if (VCS_GetPositionIs(g_pKeyHandle, g_usNodeId, &currentPosition, p_pErrorCode) == 0) {
-            LogError("VCS_GetPositionIs", lResult, *p_pErrorCode);
+        if (VCS_GetPositionIs(g_pKeyHandle, g_usNodeId, &currentPosition, &errorCode) == 0) {
+            LogError("VCS_GetPositionIs", lResult, errorCode);
             lResult = MMC_FAILED;
             return lResult;
         }
@@ -178,16 +181,17 @@ int Striker::setHome() {
         cout << "moving" << endl;
         lastPosition = currentPosition;
     }
-    if (VCS_DefinePosition(g_pKeyHandle, g_usNodeId, 0, p_pErrorCode) == 0) {
+    if (VCS_DefinePosition(g_pKeyHandle, g_usNodeId, 0, &errorCode) == 0) {
         lResult = MMC_FAILED;
     }
     return lResult;
 }
 
 int Striker::setCurrent(int value) {
-    lResult = MMC_SUCCESS;
-    if (VCS_ActivateCurrentMode(g_pKeyHandle, g_usNodeId, p_pErrorCode) == 0) {
-        LogError("VCS_ActivateProfilePositionMode", lResult, *p_pErrorCode);
+    int lResult = MMC_SUCCESS;
+    unsigned int errorCode = 0;
+    if (VCS_ActivateCurrentMode(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
+        LogError("VCS_ActivateCurrentMode", lResult, errorCode);
         lResult = MMC_FAILED;
         return lResult;
     }
@@ -196,8 +200,8 @@ int Striker::setCurrent(int value) {
     msg << "current = " << value;
     LogInfo(msg.str());
 
-    if (VCS_SetCurrentMust(g_pKeyHandle, g_usNodeId, (short) value, p_pErrorCode) == 0) {
-        LogError("VCS_SetCurrentMust", lResult, *p_pErrorCode);
+    if (VCS_SetCurrentMust(g_pKeyHandle, g_usNodeId, (short) value, &errorCode) == 0) {
+        LogError("VCS_SetCurrentMust", lResult, errorCode);
         lResult = MMC_FAILED;
         return lResult;
     }
@@ -206,22 +210,23 @@ int Striker::setCurrent(int value) {
 }
 
 int Striker::strike(int m_velocity, StrikerMode mode) {
-    lResult = MMC_SUCCESS;
+    int lResult = MMC_SUCCESS;
+    unsigned int errorCode = 0;
     std::cout << "Striking motor " << getID() << " " << m_velocity << " " << mode << std::endl;
     if (mode == Normal) {
         int current = getCurrent(m_velocity);
         if (setCurrent(current) != MMC_SUCCESS) {
-            LogError("setCurrent", lResult, *p_pErrorCode);
+            LogError("setCurrent", lResult, errorCode);
             lResult = MMC_FAILED;
             return lResult;
         }
 
-        sleep_ms(20);
+        sleep_ms(15);
 
         while (true) {
             int velocityIs = 6000;
-            if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, p_pErrorCode) == 0) {
-                LogError("VCS_GetVelocityIs", lResult, *p_pErrorCode);
+            if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, &errorCode) == 0) {
+                LogError("VCS_GetVelocityIs", lResult, errorCode);
                 lResult = MMC_FAILED;
                 return lResult;
             }
@@ -234,7 +239,7 @@ int Striker::strike(int m_velocity, StrikerMode mode) {
         int position = getTargetPosition(m_velocity);
 
         if (moveToPosition(position, acc) != MMC_SUCCESS) {
-            LogError("moveToPosition", lResult, *p_pErrorCode);
+            LogError("moveToPosition", lResult, errorCode);
             lResult = MMC_FAILED;
         }
 
@@ -244,31 +249,32 @@ int Striker::strike(int m_velocity, StrikerMode mode) {
 
 int Striker::moveToPosition(int position, unsigned int acc, bool absolute) {
     lResult = MMC_SUCCESS;
-    if (VCS_ActivateProfilePositionMode(g_pKeyHandle, g_usNodeId, p_pErrorCode) == 0) {
-        LogError("VCS_ActivateProfilePositionMode", lResult, *p_pErrorCode);
+    unsigned int errorCode = 0;
+    if (VCS_ActivateProfilePositionMode(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
+        LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
         lResult = MMC_FAILED;
     } else {
         stringstream msg;
         msg << "move to position = " << position << ", acc = " << acc;
         LogInfo(msg.str());
 
-        if (VCS_SetPositionProfile(g_pKeyHandle, g_usNodeId, velocity, acc, acc, p_pErrorCode) == 0) {
-            LogError("VCS_SetPositionProfile", lResult, *p_pErrorCode);
+        if (VCS_SetPositionProfile(g_pKeyHandle, g_usNodeId, velocity, acc, acc, &errorCode) == 0) {
+            LogError("VCS_SetPositionProfile", lResult, errorCode);
             lResult = MMC_FAILED;
             return lResult;
         }
 
-        if (VCS_MoveToPosition(g_pKeyHandle, g_usNodeId, position, absolute, 1, p_pErrorCode) == 0) {
-            LogError("VCS_MoveToPosition", lResult, *p_pErrorCode);
+        if (VCS_MoveToPosition(g_pKeyHandle, g_usNodeId, position, absolute, 1, &errorCode) == 0) {
+            LogError("VCS_MoveToPosition", lResult, errorCode);
             lResult = MMC_FAILED;
             return lResult;
         }
 
-        if (VCS_WaitForTargetReached(g_pKeyHandle, g_usNodeId, 500, p_pErrorCode) == 0) {
-            LogError("VCS_WaitForTargetReached", lResult, *p_pErrorCode);
-            lResult = MMC_FAILED;
-            return lResult;
-        }
+//        if (VCS_WaitForTargetReached(g_pKeyHandle, g_usNodeId, 500, &errorCode) == 0) {
+//            LogError("VCS_WaitForTargetReached", lResult, errorCode);
+//            lResult = MMC_FAILED;
+//            return lResult;
+//        }
     }
     return lResult;
 }
@@ -281,8 +287,9 @@ Striker::Striker(int armIndex) {
     this->armID = armIndex/2;
     this->motorID = armIndex % 2;
     SetDefaultParameters();
+    unsigned int errorCode = 0;
     if ((lResult = OpenDevice()) != MMC_SUCCESS) {
-        LogError("OpenDevice", lResult, *p_pErrorCode);
+        LogError("OpenDevice", lResult, errorCode);
     }
 }
 

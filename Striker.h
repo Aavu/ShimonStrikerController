@@ -48,22 +48,19 @@ public:
     typedef void *HANDLE;
     typedef int BOOL;
 
-    void *g_pKeyHandle = nullptr;
+    HANDLE g_pKeyHandle = 0;
     unsigned short g_usNodeId = 1;
     string g_deviceName;
     string g_protocolStackName;
     string g_interfaceName;
     string g_portName;
     unsigned int g_baudrate = 0;
-    unsigned int *p_pErrorCode;
+//    unsigned int *p_pErrorCode;
 
     unsigned int velocity = 6000;
     int armID;
     int motorID;
-    unsigned int ulErrorCode = 0;
     int lResult = MMC_FAILED;
-    vector<unsigned int> midi_velocity;
-    vector<unsigned int> timeInterval;
 
 public:
     explicit Striker(int armID, int motorID);
