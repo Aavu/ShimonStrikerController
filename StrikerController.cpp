@@ -6,6 +6,8 @@
 
 vector<Striker> StrikerController::strikers;
 
+StrikerMode strikerMode;
+
 StrikerController::StrikerController(int numberOfStrikers) {
     this->numStrikers = numberOfStrikers;
     lResult = MMC_SUCCESS;
@@ -87,15 +89,19 @@ void StrikerController::handleMessage(lo_arg **argv, const char* path) {
 
     switch (mode) {
         case Normal: {
+            strikerMode = Normal;
             Striker::normalStrike(strikers[ID], m_velocity);
             break;
         }
         case Fast: {
+            strikerMode = Fast;
             Striker::fastStrike(strikers[ID], m_velocity);
             break;
         }
         case Tremolo: {
-            Striker::tremoloStrike(strikers[ID], m_velocity);
+            strikerMode = Tremolo;
+            if (!Striker::playingTremolo)
+                thread{StrikerController::ptremoloStrike, strikers[ID], m_velocity}.detach();
             break;
         }
         default:break;
@@ -108,6 +114,10 @@ StrikerMode StrikerController::getStrikerMode(string s) {
     if (s == "fast") return Fast;
     if (s == "tremolo") return Tremolo;
     return Unknown;
+}
+
+void StrikerController::ptremoloStrike(Striker s, int m_velocity) {
+    Striker::tremoloStrike(s, m_velocity);
 }
 
 

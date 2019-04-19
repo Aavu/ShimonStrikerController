@@ -9,13 +9,13 @@
 #include "Striker.h"
 #include "NotePosition.h"
 #include "OSCReceiver.h"
-#include <thread>
 
 class StrikerController {
 private:
     int numStrikers;
     static vector<Striker> strikers;
     int lResult;
+
 
 public:
     StrikerController();
@@ -29,6 +29,8 @@ public:
     static void handleMessage(lo_arg **argv, const char* path);
 
     static StrikerMode getStrikerMode(string s);
+
+    static void ptremoloStrike(Striker s, int m_velocity);
 
 };
 

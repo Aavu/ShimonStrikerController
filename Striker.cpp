@@ -4,6 +4,8 @@
 
 #include "Striker.h"
 
+int Striker::playingTremolo = false;
+
 int Striker::getID() {
     return 2 * armID + motorID;
 }
@@ -187,13 +189,15 @@ int Striker::setHome() {
     return lResult;
 }
 
-int Striker::setCurrent(int value) {
+int Striker::setCurrent(int value, bool activate) {
     int lResult = MMC_SUCCESS;
     unsigned int errorCode = 0;
-    if (VCS_ActivateCurrentMode(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
-        LogError("VCS_ActivateCurrentMode", lResult, errorCode);
-        lResult = MMC_FAILED;
-        return lResult;
+    if (activate) {
+        if (VCS_ActivateCurrentMode(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
+            LogError("VCS_ActivateCurrentMode", lResult, errorCode);
+            lResult = MMC_FAILED;
+            return lResult;
+        }
     }
 
     stringstream msg;
@@ -221,7 +225,7 @@ int Striker::strike(int m_velocity, StrikerMode mode) {
             return lResult;
         }
 
-        sleep_ms(15);
+        sleep_ms(10);
 
         while (true) {
             int velocityIs = 6000;
@@ -247,7 +251,7 @@ int Striker::strike(int m_velocity, StrikerMode mode) {
     return lResult;
 }
 
-int Striker::moveToPosition(int position, unsigned int acc, bool absolute) {
+int Striker::moveToPosition(int position, unsigned int acc, BOOL absolute) {
     lResult = MMC_SUCCESS;
     unsigned int errorCode = 0;
     if (VCS_ActivateProfilePositionMode(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
@@ -280,6 +284,9 @@ int Striker::moveToPosition(int position, unsigned int acc, bool absolute) {
 }
 
 int Striker::getCurrent(int m_velocity) {
+    if (strikerMode == Tremolo) {
+        return (int) round(m_velocity*(-71.25) - 928.57);
+    }
     return (int)round(((m_velocity * -.714) - 59.29) * -44.44 + 333.33);
 }
 
@@ -294,13 +301,80 @@ Striker::Striker(int armIndex) {
 }
 
 void Striker::normalStrike(Striker& s, int m_velocity) {
+    strikerMode = Normal;
     s.strike(m_velocity);
 }
 
 void Striker::fastStrike(Striker& s, int m_velocity) {
+    strikerMode = Fast;
     s.strike(m_velocity, Fast);
 }
 
 void Striker::tremoloStrike(Striker& s, int m_velocity) {
-    s.strike(m_velocity, Tremolo);
+    int lResult = MMC_SUCCESS;
+    playingTremolo = true;
+    unsigned int errorCode = 0;
+    if (s.moveToPosition(0, 2000) != MMC_SUCCESS) {
+        s.LogError("moveToPosition", lResult, errorCode);
+        lResult = MMC_FAILED;
+        return;
+    }
+
+    sleep_ms(10);
+
+    if (VCS_ActivateCurrentMode(s.g_pKeyHandle, s.g_usNodeId, &errorCode) == 0) {
+        s.LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
+        lResult = MMC_FAILED;
+        return;
+    }
+
+    cout << "playing Tremolo..." << endl;
+
+    while (strikerMode == Tremolo) {
+        auto startTime = chrono::steady_clock::now();
+        int current = getCurrent(m_velocity);
+        if (s.setCurrent(current, false) != MMC_SUCCESS) {
+            s.LogError("setCurrent", lResult, errorCode);
+            lResult = MMC_FAILED;
+            playingTremolo = false;
+            return;
+        }
+        auto endTime = chrono::steady_clock::now();
+        auto ms = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+
+        sleep_ms(abs(5 - ms));
+
+        if (s.setCurrent(-current, false) != MMC_SUCCESS) {
+            s.LogError("setCurrent", lResult, errorCode);
+            lResult = MMC_FAILED;
+            playingTremolo = false;
+            return;
+        }
+
+        sleep_ms(10);
+
+        lResult = s.waitTillHit(10);
+        if (lResult != MMC_SUCCESS) {
+            playingTremolo = false;
+            s.LogError("waitTillHit", lResult, errorCode);
+            return;
+        }
+    }
+    cout << "Stopped Tremolo.." << endl;
+    playingTremolo = false;
+    return;
+}
+
+int Striker::waitTillHit(int velocityThreshold) {
+    int velocityIs;
+    unsigned int errorCode = 0;
+    do {
+        if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, &errorCode) == 0) {
+            LogError("VCS_GetVelocityIs", lResult, errorCode);
+            lResult = MMC_FAILED;
+            break;
+//            return lResult;
+        }
+    } while (velocityIs > velocityThreshold);
+    return MMC_SUCCESS;
 }

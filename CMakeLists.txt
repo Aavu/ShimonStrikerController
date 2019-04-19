@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-set(PROJECT OSC-test)
+set(PROJECT ShimonStrikerController)
 project(${PROJECT})
 
 INCLUDE_DIRECTORIES(/usr/local/include)
@@ -11,5 +11,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 
 find_package(liblo REQUIRED)
 add_executable(${PROJECT_NAME} main.cpp OSCReceiver.cpp OSCReceiver.h StrikerController.cpp StrikerController.h
-        Striker.cpp Striker.h NotePosition.cpp NotePosition.h DS.h)
+        Striker.cpp Striker.h NotePosition.cpp NotePosition.h DS.h Globals.h)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} lo -lEposCmd -pthread)

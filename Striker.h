@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "Definitions.h"
+#include "Globals.h"
 #include <string.h>
 #include <sstream>
 #include <getopt.h>
@@ -19,6 +20,8 @@
 #include <fstream>
 #include <thread>
 #include <iomanip>
+#include <chrono>
+
 
 using namespace std;
 
@@ -38,13 +41,9 @@ using namespace std;
 #define DEFAULT_VELOCITY 80
 #endif
 
-enum StrikerMode {
-    Normal, Fast, Tremolo, Unknown
-};
-
 class Striker {
-
 public:
+    static int playingTremolo;
     typedef void *HANDLE;
     typedef int BOOL;
 
@@ -55,7 +54,6 @@ public:
     string g_interfaceName;
     string g_portName;
     unsigned int g_baudrate = 0;
-//    unsigned int *p_pErrorCode;
 
     unsigned int velocity = 6000;
     int armID;
@@ -73,18 +71,20 @@ public:
     int Prepare();
     unsigned int getAcceleration(int x);
     int getTargetPosition(int x);
-    void sleep_ms(unsigned int time);
+    static void sleep_ms(unsigned int time);
     int setHome();
-    int setCurrent(int value);
+    int setCurrent(int value, bool activate = true);
     int getID();
     int strike(int m_velocity = DEFAULT_VELOCITY, StrikerMode mode = Normal);
-    int moveToPosition(int position, unsigned int acc, bool absolute = 1);
-    int getCurrent(int m_velocity);
+    int moveToPosition(int position, unsigned int acc, BOOL absolute = 1);
+    static int getCurrent(int m_velocity);
 
     //diff modes
     static void normalStrike(Striker& s, int m_velocity = DEFAULT_VELOCITY);
     static void fastStrike(Striker& s, int m_velocity = DEFAULT_VELOCITY);
     static void tremoloStrike(Striker& s, int m_velocity = DEFAULT_VELOCITY);
+
+    int waitTillHit(int velocityThreshold);
 };
 
 
