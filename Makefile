@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nvidia/CLionProjects/OSC-test
+CMAKE_SOURCE_DIR = /home/nvidia/CLionProjects/ShimonStrikerController
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nvidia/CLionProjects/OSC-test
+CMAKE_BINARY_DIR = /home/nvidia/CLionProjects/ShimonStrikerController
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nvidia/CLionProjects/OSC-test/CMakeFiles /home/nvidia/CLionProjects/OSC-test/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles /home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nvidia/CLionProjects/OSC-test/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named OSC-test
+# Target rules for targets named ShimonStrikerController
 
 # Build rule for target.
-OSC-test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 OSC-test
-.PHONY : OSC-test
+ShimonStrikerController: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ShimonStrikerController
+.PHONY : ShimonStrikerController
 
 # fast build rule for target.
-OSC-test/fast:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/build
-.PHONY : OSC-test/fast
+ShimonStrikerController/fast:
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/build
+.PHONY : ShimonStrikerController/fast
 
 NotePosition.o: NotePosition.cpp.o
 
@@ -129,7 +129,7 @@ NotePosition.o: NotePosition.cpp.o
 
 # target to build an object file
 NotePosition.cpp.o:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/NotePosition.cpp.o
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/NotePosition.cpp.o
 .PHONY : NotePosition.cpp.o
 
 NotePosition.i: NotePosition.cpp.i
@@ -138,7 +138,7 @@ NotePosition.i: NotePosition.cpp.i
 
 # target to preprocess a source file
 NotePosition.cpp.i:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/NotePosition.cpp.i
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/NotePosition.cpp.i
 .PHONY : NotePosition.cpp.i
 
 NotePosition.s: NotePosition.cpp.s
@@ -147,7 +147,7 @@ NotePosition.s: NotePosition.cpp.s
 
 # target to generate assembly for a file
 NotePosition.cpp.s:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/NotePosition.cpp.s
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/NotePosition.cpp.s
 .PHONY : NotePosition.cpp.s
 
 OSCReceiver.o: OSCReceiver.cpp.o
@@ -156,7 +156,7 @@ OSCReceiver.o: OSCReceiver.cpp.o
 
 # target to build an object file
 OSCReceiver.cpp.o:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/OSCReceiver.cpp.o
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/OSCReceiver.cpp.o
 .PHONY : OSCReceiver.cpp.o
 
 OSCReceiver.i: OSCReceiver.cpp.i
@@ -165,7 +165,7 @@ OSCReceiver.i: OSCReceiver.cpp.i
 
 # target to preprocess a source file
 OSCReceiver.cpp.i:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/OSCReceiver.cpp.i
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/OSCReceiver.cpp.i
 .PHONY : OSCReceiver.cpp.i
 
 OSCReceiver.s: OSCReceiver.cpp.s
@@ -174,7 +174,7 @@ OSCReceiver.s: OSCReceiver.cpp.s
 
 # target to generate assembly for a file
 OSCReceiver.cpp.s:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/OSCReceiver.cpp.s
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/OSCReceiver.cpp.s
 .PHONY : OSCReceiver.cpp.s
 
 Striker.o: Striker.cpp.o
@@ -183,7 +183,7 @@ Striker.o: Striker.cpp.o
 
 # target to build an object file
 Striker.cpp.o:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/Striker.cpp.o
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/Striker.cpp.o
 .PHONY : Striker.cpp.o
 
 Striker.i: Striker.cpp.i
@@ -192,7 +192,7 @@ Striker.i: Striker.cpp.i
 
 # target to preprocess a source file
 Striker.cpp.i:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/Striker.cpp.i
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/Striker.cpp.i
 .PHONY : Striker.cpp.i
 
 Striker.s: Striker.cpp.s
@@ -201,7 +201,7 @@ Striker.s: Striker.cpp.s
 
 # target to generate assembly for a file
 Striker.cpp.s:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/Striker.cpp.s
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/Striker.cpp.s
 .PHONY : Striker.cpp.s
 
 StrikerController.o: StrikerController.cpp.o
@@ -210,7 +210,7 @@ StrikerController.o: StrikerController.cpp.o
 
 # target to build an object file
 StrikerController.cpp.o:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/StrikerController.cpp.o
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/StrikerController.cpp.o
 .PHONY : StrikerController.cpp.o
 
 StrikerController.i: StrikerController.cpp.i
@@ -219,7 +219,7 @@ StrikerController.i: StrikerController.cpp.i
 
 # target to preprocess a source file
 StrikerController.cpp.i:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/StrikerController.cpp.i
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/StrikerController.cpp.i
 .PHONY : StrikerController.cpp.i
 
 StrikerController.s: StrikerController.cpp.s
@@ -228,7 +228,7 @@ StrikerController.s: StrikerController.cpp.s
 
 # target to generate assembly for a file
 StrikerController.cpp.s:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/StrikerController.cpp.s
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/StrikerController.cpp.s
 .PHONY : StrikerController.cpp.s
 
 main.o: main.cpp.o
@@ -237,7 +237,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/main.cpp.o
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -246,7 +246,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/main.cpp.i
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -255,7 +255,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) -f CMakeFiles/OSC-test.dir/build.make CMakeFiles/OSC-test.dir/main.cpp.s
+	$(MAKE) -f CMakeFiles/ShimonStrikerController.dir/build.make CMakeFiles/ShimonStrikerController.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -266,7 +266,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... OSC-test"
+	@echo "... ShimonStrikerController"
 	@echo "... NotePosition.o"
 	@echo "... NotePosition.i"
 	@echo "... NotePosition.s"

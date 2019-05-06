@@ -1,0 +1,4 @@
+Cannot generate into /home/nvidia/OSC-test
+It is already used for project /Users/violinsimma/CLionProjects/OSC-test
+
+Please either delete it manually or select another generation directory

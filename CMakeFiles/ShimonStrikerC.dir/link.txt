@@ -1,0 +1,1 @@
+/usr/bin/g++   -g -Wall   CMakeFiles/ShimonStrikerC.dir/main.cpp.o CMakeFiles/ShimonStrikerC.dir/OSCReceiver.cpp.o CMakeFiles/ShimonStrikerC.dir/StrikerController.cpp.o CMakeFiles/ShimonStrikerC.dir/Striker.cpp.o CMakeFiles/ShimonStrikerC.dir/NotePosition.cpp.o  -o ShimonStrikerC  -L/usr/local/lib -llo -lEposCmd -pthread -Wl,-rpath,/usr/local/lib 
