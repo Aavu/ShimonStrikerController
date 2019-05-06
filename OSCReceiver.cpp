@@ -19,11 +19,14 @@ int OSCReceiver::start(int port) {
 
 
     std::cout << "URL: " << st.url() << std::endl;
+
+    //receives msg from osc address "/Striker", "sii" is string integer integer, mode, ID, velocity
     st.add_method("/Striker", "sii",
                   [&received](const char* path, const char* types, lo_arg **argv, int) {
         StrikerController::handleMessage(argv, path);
     });
 
+    //receives quit msg from osc address "/Striker"
     st.add_method("/Striker", "s",
                   [&received](const char* path, const char* types, lo_arg **argv, int) {
                       OSCReceiver::handleQuit(argv);

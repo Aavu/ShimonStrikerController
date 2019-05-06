@@ -33,7 +33,7 @@ void Striker::LogInfo(const string& message) {
 }
 
 void Striker::SetDefaultParameters() {
-    g_usNodeId = 1;
+    g_usNodeId = 2;
     g_deviceName = "EPOS4";
     g_protocolStackName = "MAXON SERIAL V2";
     g_interfaceName = "USB";
@@ -53,7 +53,15 @@ int Striker::OpenDevice() {
     strcpy(pProtocolStackName, g_protocolStackName.c_str());
     strcpy(pInterfaceName, g_interfaceName.c_str());
     strcpy(pPortName, g_portName.c_str());
-    LogInfo("Open device...");
+
+    int end = 10;
+    cout << pProtocolStackName << endl;
+    VCS_GetProtocolStackNameSelection(pDeviceName, 1, pProtocolStackName, 100, &end, &errorCode);
+    cout << pProtocolStackName << endl;
+    VCS_GetInterfaceNameSelection(pDeviceName, pProtocolStackName, 1, pInterfaceName, 100, &end, &errorCode);
+    cout << pInterfaceName << endl;
+
+    LogInfo("Opening device...");
     g_pKeyHandle = VCS_OpenDevice(pDeviceName, pProtocolStackName, pInterfaceName, pPortName, &errorCode);
 
     if (g_pKeyHandle != 0 && errorCode == 0) {
@@ -323,8 +331,8 @@ void Striker::tremoloStrike(Striker& s, int m_velocity) {
     sleep_ms(10);
 
     if (VCS_ActivateCurrentMode(s.g_pKeyHandle, s.g_usNodeId, &errorCode) == 0) {
-        s.LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
         lResult = MMC_FAILED;
+        s.LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
         return;
     }
 
@@ -334,8 +342,8 @@ void Striker::tremoloStrike(Striker& s, int m_velocity) {
         auto startTime = chrono::steady_clock::now();
         int current = getCurrent(m_velocity);
         if (s.setCurrent(current, false) != MMC_SUCCESS) {
-            s.LogError("setCurrent", lResult, errorCode);
             lResult = MMC_FAILED;
+            s.LogError("setCurrent", lResult, errorCode);
             playingTremolo = false;
             return;
         }
@@ -345,8 +353,8 @@ void Striker::tremoloStrike(Striker& s, int m_velocity) {
         sleep_ms(abs(5 - ms));
 
         if (s.setCurrent(-current, false) != MMC_SUCCESS) {
-            s.LogError("setCurrent", lResult, errorCode);
             lResult = MMC_FAILED;
+            s.LogError("setCurrent", lResult, errorCode);
             playingTremolo = false;
             return;
         }
@@ -370,8 +378,8 @@ int Striker::waitTillHit(int velocityThreshold) {
     unsigned int errorCode = 0;
     do {
         if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, &errorCode) == 0) {
-            LogError("VCS_GetVelocityIs", lResult, errorCode);
             lResult = MMC_FAILED;
+            LogError("VCS_GetVelocityIs", lResult, errorCode);
             break;
 //            return lResult;
         }
