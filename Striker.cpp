@@ -6,8 +6,8 @@
 
 int Striker::playingTremolo = false;
 
-int Striker::getID() {
-    return 2 * armID + motorID;
+int Striker::getNodeID() {
+    return ID;
 }
 
 void Striker::sleep_ms(unsigned int time) {
@@ -24,7 +24,7 @@ int Striker::getTargetPosition(int x) {
 }
 
 void Striker::LogError(const string& functionName, int p_lResult, unsigned int p_ulErrorCode) {
-    cerr << functionName << " failed arm " << armID << ", motor " << motorID << " (result=" << p_lResult
+    cerr << functionName << " failed arm " << ID << " (result=" << p_lResult
          << ", errorCode=0x" << std::hex << p_ulErrorCode << ")" << endl;
 }
 
@@ -33,7 +33,7 @@ void Striker::LogInfo(const string& message) {
 }
 
 void Striker::SetDefaultParameters() {
-    g_usNodeId = 2;
+    g_usNodeId = getNodeID();
     g_deviceName = "EPOS4";
     g_protocolStackName = "MAXON SERIAL V2";
     g_interfaceName = "USB";
@@ -42,7 +42,7 @@ void Striker::SetDefaultParameters() {
 }
 
 int Striker::OpenDevice() {
-    lResult = MMC_FAILED;
+    int lResult = MMC_FAILED;
     unsigned int errorCode = 0;
     char *pDeviceName = new char[255];
     char *pProtocolStackName = new char[255];
@@ -64,8 +64,8 @@ int Striker::OpenDevice() {
     LogInfo("Opening device...");
     g_pKeyHandle = VCS_OpenDevice(pDeviceName, pProtocolStackName, pInterfaceName, pPortName, &errorCode);
 
-    if (g_pKeyHandle != 0 && errorCode == 0) {
-        cout << "Successfully Opened Striker-" << getID() << endl;
+    if (g_pKeyHandle != nullptr && errorCode == 0) {
+        cout << "Successfully Opened Striker-" << getNodeID() << endl;
         unsigned int lBaudrate = 0;
         unsigned int lTimeout = 0;
 
@@ -79,7 +79,7 @@ int Striker::OpenDevice() {
             }
         }
     } else {
-        g_pKeyHandle = 0;
+        g_pKeyHandle = nullptr;
     }
 
     delete[]pDeviceName;
@@ -91,7 +91,7 @@ int Striker::OpenDevice() {
 }
 
 int Striker::CloseDevice() {
-    lResult = MMC_FAILED;
+    int lResult = MMC_FAILED;
     unsigned int errorCode = 0;
     LogInfo("Close device");
 
@@ -109,7 +109,7 @@ int Striker::CloseDevice() {
 
 int Striker::Prepare() {
     BOOL oIsFault = 0;
-    lResult = MMC_SUCCESS;
+    int lResult = MMC_SUCCESS;
     unsigned int errorCode = 0;
     if (VCS_GetFaultState(g_pKeyHandle, g_usNodeId, &oIsFault, &errorCode) == 0) {
         LogError("VCS_GetFaultState", lResult, errorCode);
@@ -158,19 +158,19 @@ int Striker::Prepare() {
     return lResult;
 }
 
-Striker::Striker(int armID, int motorID) {
-    this->armID = armID;
-    this->motorID = motorID;
-    SetDefaultParameters();
-    unsigned int errorCode = 0;
-    if ((lResult = OpenDevice()) != MMC_SUCCESS) {
-        LogError("OpenDevice", lResult, errorCode);
-    }
-}
+//Striker::Striker(int armID, int motorID) {
+//    this->armID = armID;
+//    this->motorID = motorID;
+//    SetDefaultParameters();
+//    unsigned int errorCode = 0;
+//    if ((lResult = OpenDevice()) != MMC_SUCCESS) {
+//        LogError("OpenDevice", lResult, errorCode);
+//    }
+//}
 
 int Striker::setHome() {
     LogInfo("Setting Home..");
-    lResult = MMC_SUCCESS;
+    int lResult = MMC_SUCCESS;
     int lastPosition = 10000;
     int currentPosition = -10000;
     unsigned int errorCode = 0;
@@ -224,43 +224,45 @@ int Striker::setCurrent(int value, bool activate) {
 int Striker::strike(int m_velocity, StrikerMode mode) {
     int lResult = MMC_SUCCESS;
     unsigned int errorCode = 0;
-    std::cout << "Striking motor " << getID() << " " << m_velocity << " " << mode << std::endl;
-    if (mode == Normal) {
-        int current = getCurrent(m_velocity);
-        if (setCurrent(current) != MMC_SUCCESS) {
-            LogError("setCurrent", lResult, errorCode);
-            lResult = MMC_FAILED;
-            return lResult;
-        }
-
-        sleep_ms(10);
-
-        while (true) {
-            int velocityIs = 6000;
-            if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, &errorCode) == 0) {
-                LogError("VCS_GetVelocityIs", lResult, errorCode);
+    if (!dummy) {
+        std::cout << "Striking motor " << getNodeID() << " " << m_velocity << " " << mode << std::endl;
+        if (mode == Normal) {
+            int current = getCurrent(m_velocity);
+            if (setCurrent(current) != MMC_SUCCESS) {
+                LogError("setCurrent", lResult, errorCode);
                 lResult = MMC_FAILED;
                 return lResult;
             }
-            if (velocityIs < 20) {
-                break;
+
+            sleep_ms(10);
+
+            while (true) {
+                int velocityIs = 6000;
+                if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, &errorCode) == 0) {
+                    LogError("VCS_GetVelocityIs", lResult, errorCode);
+                    lResult = MMC_FAILED;
+                    return lResult;
+                }
+                if (velocityIs < 20) {
+                    break;
+                }
             }
+
+            unsigned int acc = getAcceleration(m_velocity);
+            int position = getTargetPosition(m_velocity);
+
+            if (moveToPosition(position, acc) != MMC_SUCCESS) {
+                LogError("moveToPosition", lResult, errorCode);
+                lResult = MMC_FAILED;
+            }
+
         }
-
-        unsigned int acc = getAcceleration(m_velocity);
-        int position = getTargetPosition(m_velocity);
-
-        if (moveToPosition(position, acc) != MMC_SUCCESS) {
-            LogError("moveToPosition", lResult, errorCode);
-            lResult = MMC_FAILED;
-        }
-
     }
     return lResult;
 }
 
 int Striker::moveToPosition(int position, unsigned int acc, BOOL absolute) {
-    lResult = MMC_SUCCESS;
+    int lResult = MMC_SUCCESS;
     unsigned int errorCode = 0;
     if (VCS_ActivateProfilePositionMode(g_pKeyHandle, g_usNodeId, &errorCode) == 0) {
         LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
@@ -298,13 +300,16 @@ int Striker::getCurrent(int m_velocity) {
     return (int)round(((m_velocity * -.714) - 59.29) * -44.44 + 333.33);
 }
 
-Striker::Striker(int armIndex) {
-    this->armID = armIndex/2;
-    this->motorID = armIndex % 2;
-    SetDefaultParameters();
-    unsigned int errorCode = 0;
-    if ((lResult = OpenDevice()) != MMC_SUCCESS) {
-        LogError("OpenDevice", lResult, errorCode);
+Striker::Striker(int ID) {
+    this->ID = ID;
+    this->dummy = this->ID == 0;
+    if (!dummy) {
+        SetDefaultParameters();
+        unsigned int errorCode = 0;
+        int lResult;
+        if ((lResult = OpenDevice()) != MMC_SUCCESS) {
+            LogError("OpenDevice", lResult, errorCode);
+        }
     }
 }
 
@@ -320,69 +325,70 @@ void Striker::fastStrike(Striker& s, int m_velocity) {
 
 void Striker::tremoloStrike(Striker& s, int m_velocity) {
     int lResult = MMC_SUCCESS;
-    playingTremolo = true;
     unsigned int errorCode = 0;
-    if (s.moveToPosition(0, 2000) != MMC_SUCCESS) {
-        s.LogError("moveToPosition", lResult, errorCode);
-        lResult = MMC_FAILED;
-        return;
-    }
-
-    sleep_ms(10);
-
-    if (VCS_ActivateCurrentMode(s.g_pKeyHandle, s.g_usNodeId, &errorCode) == 0) {
-        lResult = MMC_FAILED;
-        s.LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
-        return;
-    }
-
-    cout << "playing Tremolo..." << endl;
-
-    while (strikerMode == Tremolo) {
-        auto startTime = chrono::steady_clock::now();
-        int current = getCurrent(m_velocity);
-        if (s.setCurrent(current, false) != MMC_SUCCESS) {
-            lResult = MMC_FAILED;
-            s.LogError("setCurrent", lResult, errorCode);
-            playingTremolo = false;
-            return;
-        }
-        auto endTime = chrono::steady_clock::now();
-        auto ms = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
-
-        sleep_ms(abs(5 - ms));
-
-        if (s.setCurrent(-current, false) != MMC_SUCCESS) {
-            lResult = MMC_FAILED;
-            s.LogError("setCurrent", lResult, errorCode);
-            playingTremolo = false;
+    if (!s.dummy) {
+        playingTremolo = true;
+        if (s.moveToPosition(0, 2000) != MMC_SUCCESS) {
+            s.LogError("moveToPosition", lResult, errorCode);
             return;
         }
 
         sleep_ms(10);
 
-        lResult = s.waitTillHit(10);
-        if (lResult != MMC_SUCCESS) {
-            playingTremolo = false;
-            s.LogError("waitTillHit", lResult, errorCode);
+        if (VCS_ActivateCurrentMode(s.g_pKeyHandle, s.g_usNodeId, &errorCode) == 0) {
+            lResult = MMC_FAILED;
+            s.LogError("VCS_ActivateProfilePositionMode", lResult, errorCode);
             return;
         }
+
+        cout << "playing Tremolo..." << endl;
+
+        while (strikerMode == Tremolo) {
+            auto startTime = chrono::steady_clock::now();
+            int current = getCurrent(m_velocity);
+            if (s.setCurrent(current, false) != MMC_SUCCESS) {
+                lResult = MMC_FAILED;
+                s.LogError("setCurrent", lResult, errorCode);
+                playingTremolo = false;
+                return;
+            }
+            auto endTime = chrono::steady_clock::now();
+            auto ms = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+
+            sleep_ms(abs(5 - ms));
+
+            if (s.setCurrent(-current, false) != MMC_SUCCESS) {
+                lResult = MMC_FAILED;
+                s.LogError("setCurrent", lResult, errorCode);
+                playingTremolo = false;
+                return;
+            }
+
+            sleep_ms(10);
+
+            lResult = s.waitTillHit(10);
+            if (lResult != MMC_SUCCESS) {
+                playingTremolo = false;
+                s.LogError("waitTillHit", lResult, errorCode);
+                return;
+            }
+        }
+        cout << "Stopped Tremolo.." << endl;
+        playingTremolo = false;
     }
-    cout << "Stopped Tremolo.." << endl;
-    playingTremolo = false;
-    return;
 }
 
 int Striker::waitTillHit(int velocityThreshold) {
     int velocityIs;
     unsigned int errorCode = 0;
+    int lResult = MMC_SUCCESS;
     do {
         if (VCS_GetVelocityIs(g_pKeyHandle, g_usNodeId, &velocityIs, &errorCode) == 0) {
             lResult = MMC_FAILED;
             LogError("VCS_GetVelocityIs", lResult, errorCode);
             break;
-//            return lResult;
         }
+        sleep_ms(5);    // Experiment with these values
     } while (velocityIs > velocityThreshold);
-    return MMC_SUCCESS;
+    return lResult;
 }

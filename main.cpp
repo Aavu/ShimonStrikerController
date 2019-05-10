@@ -5,7 +5,7 @@
 
 int main(int argc, char * argv[]) {
     try {
-        auto controller = StrikerController(1);
+        auto controller = StrikerController();
         controller.startOSC(30309);
     } catch (std::exception &e) {
         std::cout << e.what() << endl;

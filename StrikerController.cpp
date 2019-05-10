@@ -8,12 +8,16 @@ vector<Striker> StrikerController::strikers;
 
 StrikerMode strikerMode;
 
-StrikerController::StrikerController(int numberOfStrikers) {
-    this->numStrikers = numberOfStrikers;
-    lResult = MMC_SUCCESS;
-    for(int i = 0; i < numStrikers; i++) {
-        strikers.emplace_back(Striker(i));
-    }
+StrikerController::StrikerController() {
+    int lResult;
+    strikers.emplace_back(Striker(0));  // Dummy
+    strikers.emplace_back(Striker(0));  // Dummy
+    strikers.emplace_back(Striker(2));
+    strikers.emplace_back(Striker(3));
+    strikers.emplace_back(Striker(4));
+//    for(int i = 0; i < numStrikers; i++) {
+//        strikers.emplace_back(Striker(i));
+//    }
     lResult = prepareStrikers();
     if (lResult != MMC_SUCCESS) {
         throw std::exception();
@@ -21,16 +25,12 @@ StrikerController::StrikerController(int numberOfStrikers) {
 }
 
 int StrikerController::prepareStrikers() {
-    lResult = MMC_SUCCESS;
+    int lResult = MMC_SUCCESS;
     unsigned int errorCode = 0;
     for (auto &s : strikers) {
-        if ((lResult = s.lResult) != MMC_SUCCESS) {
+        if ((lResult = s.Prepare()) != MMC_SUCCESS) {
+            s.LogError("Prepare", lResult, errorCode);
             return lResult;
-        } else {
-            if ((lResult = s.Prepare()) != MMC_SUCCESS) {
-                s.LogError("Prepare", lResult, errorCode);
-                return lResult;
-            }
         }
     }
     return lResult;
@@ -43,19 +43,19 @@ void StrikerController::strike(int ID, int m_velocity, StrikerMode mode) {
 int StrikerController::getIdFor(IAI_Message msg) {
     auto notePosition = NotePosition();
     if (notePosition.isWhiteKey(msg.Xtarget)) {
-        return (((msg.armID - 1) * 2) + 1);
+        return msg.armID + 2;
     } else {
-        return ((msg.armID - 1) * 2);
+        return msg.armID;
     }
 }
 
-void StrikerController::strike(IAI_Message message, StrikerMode mode) {
-    auto armID = getIdFor(message);
-    strike(armID, message.hitVelocity, mode);
-}
+//void StrikerController::strike(IAI_Message message, StrikerMode mode) {
+//    auto armID = getIdFor(message);
+//    strike(armID, message.hitVelocity, mode);
+//}
 
 StrikerController::~StrikerController() noexcept(false) {
-    lResult = MMC_SUCCESS;
+    int lResult;
 
     for (auto s:strikers) {
         lResult = s.CloseDevice();
@@ -66,13 +66,12 @@ StrikerController::~StrikerController() noexcept(false) {
 
 }
 
-StrikerController::StrikerController() {
-    lResult = MMC_SUCCESS;
-    for(int i = 0; i < 1; i++) {
-        strikers.emplace_back(Striker(i));
-    }
-    numStrikers = strikers.size();
-}
+//StrikerController::StrikerController() {
+//    for(int i = 0; i < 1; i++) {
+//        strikers.emplace_back(Striker(i));
+//    }
+//    numStrikers = strikers.size();
+//}
 
 void StrikerController::startOSC(int port) {
     auto server = OSCReceiver();
@@ -90,12 +89,12 @@ void StrikerController::handleMessage(lo_arg **argv, const char* path) {
     switch (mode) {
         case Normal: {
             strikerMode = Normal;
-            Striker::normalStrike(strikers[ID], m_velocity);
+            thread{StrikerController::pNormalStrike, strikers[ID], m_velocity}.detach();
             break;
         }
         case Fast: {
             strikerMode = Fast;
-            Striker::fastStrike(strikers[ID], m_velocity);
+            thread{StrikerController::pFastStrike, strikers[ID], m_velocity}.detach();
             break;
         }
         case Tremolo: {
@@ -118,6 +117,14 @@ StrikerMode StrikerController::getStrikerMode(string s) {
 
 void StrikerController::ptremoloStrike(Striker s, int m_velocity) {
     Striker::tremoloStrike(s, m_velocity);
+}
+
+void StrikerController::pNormalStrike(Striker s, int m_velocity) {
+    Striker::normalStrike(s, m_velocity);
+}
+
+void StrikerController::pFastStrike(Striker s, int m_velocity) {
+    Striker::fastStrike(s, m_velocity);
 }
 
 

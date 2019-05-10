@@ -4,13 +4,13 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/nvidia/CLionProjects/ShimonStrikerController/NotePosition.cpp" "/home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/NotePosition.cpp.o"
-  "/home/nvidia/CLionProjects/ShimonStrikerController/OSCReceiver.cpp" "/home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/OSCReceiver.cpp.o"
-  "/home/nvidia/CLionProjects/ShimonStrikerController/Striker.cpp" "/home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/Striker.cpp.o"
-  "/home/nvidia/CLionProjects/ShimonStrikerController/StrikerController.cpp" "/home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/StrikerController.cpp.o"
-  "/home/nvidia/CLionProjects/ShimonStrikerController/main.cpp" "/home/nvidia/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/main.cpp.o"
+  "/Users/violinsimma/CLionProjects/ShimonStrikerController/NotePosition.cpp" "/Users/violinsimma/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/NotePosition.cpp.o"
+  "/Users/violinsimma/CLionProjects/ShimonStrikerController/OSCReceiver.cpp" "/Users/violinsimma/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/OSCReceiver.cpp.o"
+  "/Users/violinsimma/CLionProjects/ShimonStrikerController/Striker.cpp" "/Users/violinsimma/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/Striker.cpp.o"
+  "/Users/violinsimma/CLionProjects/ShimonStrikerController/StrikerController.cpp" "/Users/violinsimma/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/StrikerController.cpp.o"
+  "/Users/violinsimma/CLionProjects/ShimonStrikerController/main.cpp" "/Users/violinsimma/CLionProjects/ShimonStrikerController/CMakeFiles/ShimonStrikerController.dir/main.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH

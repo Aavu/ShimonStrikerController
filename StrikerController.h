@@ -12,16 +12,13 @@
 
 class StrikerController {
 private:
-    int numStrikers;
     static vector<Striker> strikers;
-    int lResult;
-
 
 public:
-    StrikerController();
-    explicit StrikerController(int numberOfStrikers = 1);
+//    StrikerController();
+    explicit StrikerController();
     int prepareStrikers();
-    void strike(IAI_Message message, StrikerMode mode = Normal);
+//    void strike(IAI_Message message, StrikerMode mode = Normal);
     void strike(int ID, int m_velocity = DEFAULT_VELOCITY, StrikerMode mode = Normal);
     int getIdFor(IAI_Message msg);
     ~StrikerController() noexcept(false);
@@ -31,6 +28,8 @@ public:
     static StrikerMode getStrikerMode(string s);
 
     static void ptremoloStrike(Striker s, int m_velocity);
+    static void pNormalStrike(Striker s, int m_velocity);
+    static void pFastStrike(Striker s, int m_velocity);
 
 };
 

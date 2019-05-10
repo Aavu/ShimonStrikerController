@@ -1,1 +1,0 @@
-/usr/bin/g++   -g -Wall   CMakeFiles/OSC-test.dir/main.cpp.o CMakeFiles/OSC-test.dir/OSCReceiver.cpp.o CMakeFiles/OSC-test.dir/StrikerController.cpp.o CMakeFiles/OSC-test.dir/Striker.cpp.o CMakeFiles/OSC-test.dir/NotePosition.cpp.o  -o OSC-test  -L/usr/local/lib -llo -lEposCmd -pthread -Wl,-rpath,/usr/local/lib 

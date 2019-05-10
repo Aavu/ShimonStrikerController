@@ -56,13 +56,13 @@ public:
     unsigned int g_baudrate = 0;
 
     unsigned int velocity = 6000;
-    int armID;
-    int motorID;
-    int lResult = MMC_FAILED;
+
+private:
+    int ID;
+    bool dummy = false;
 
 public:
-    explicit Striker(int armID, int motorID);
-    explicit Striker(int armIndex);
+    explicit Striker(int ID);
     void LogError(const string& functionName, int p_lResult, unsigned int p_ulErrorCode);
     void LogInfo(const string& message);
     int OpenDevice();
@@ -74,7 +74,7 @@ public:
     static void sleep_ms(unsigned int time);
     int setHome();
     int setCurrent(int value, bool activate = true);
-    int getID();
+    int getNodeID();
     int strike(int m_velocity = DEFAULT_VELOCITY, StrikerMode mode = Normal);
     int moveToPosition(int position, unsigned int acc, BOOL absolute = 1);
     static int getCurrent(int m_velocity);
